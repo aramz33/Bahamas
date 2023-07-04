@@ -94,12 +94,12 @@ class AudioUploadView(View):
 
         with open(audio_wav, 'rb') as file:
             response = openai.Audio.translate("whisper-1", file)
+            if response:
+                transcription = response.get('text')
+                os.remove(output_file)
+                return transcription
 
         os.remove(output_file)
-
-        if response:
-            transcription = response.get('text')
-            return transcription
 
         # Return None or handle transcription failure accordingly
         return None
