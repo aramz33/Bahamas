@@ -1,8 +1,12 @@
+import random
+
 import openai
 from django.shortcuts import render
 from django.views import View
+from pydub import AudioSegment
+import os
 
-API_KEY = "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"
+API_KEY = "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"
 
 
 class AudioUploadView(View):
@@ -11,10 +15,11 @@ class AudioUploadView(View):
 
     def post(self, request):
         uploaded_files = request.FILES.getlist('files')
-        text_input = request.POST.get('text')
+        text_inputs = request.POST.getlist('text')
+        types = request.POST.getlist('type')
 
-        if uploaded_files or text_input:
-            summary = self.generate_summary(text_input, uploaded_files)
+        if uploaded_files or text_inputs:
+            summary = self.generate_summary(text_inputs, types, uploaded_files)
             if summary:
                 return render(request, 'upload.html', {'success': 'Summary: ' + summary})
             else:
@@ -22,7 +27,7 @@ class AudioUploadView(View):
 
         return render(request, 'upload.html', {'error': 'No file or text input provided.'})
 
-    def generate_summary(self, text_input, audio_files):
+    def generate_summary(self, text_inputs, types, audio_files):
 
         if audio_files:
             openai.api_key = API_KEY
@@ -33,28 +38,36 @@ class AudioUploadView(View):
                 transcription = self.transcribe_audio_with_api(audio_file)
                 if transcription:
                     i += 1
-                    text_input += '\n' + 'Transcription' + str(i) + ":" + transcription
+                    text_inputs.append('\n' + transcription)
+                    types.append('Transcription' + str(i))
 
         openai.api_key = API_KEY
+        system_content = "You are a professional assistant with one job: summarize the following conversation and " \
+                         "highlight the " \
+                         "most important points under bullet points, and going back to the line after each bullet " \
+                         "point, as if you were using the input to build a project proposal contract. You will get " \
+                         "both the transcription of audio files and text inputs. If information is repeated in both " \
+                         "the audio files and text inputs, you should only include it once in the summary. Each " \
+                         "text_input is going to indicate beforehand what kind of input it is: a PDF summary, " \
+                         "a general conversation, or a video meeting transcription. Take that into account when " \
+                         "analysing the text inputs.\n\nYour response should be organized as follows:\n1. Project " \
+                         "description\n2. Goal\n3. Objectives \n\n 4. Methodology \n\n 5. Scope \n\n 6. Deliverables " \
+                         "\n\n 7. Timeline \n\n 8. Budget \n\n 9. Risks \n\n 10. Conclusion. \n\n If a section is not " \
+                         "applicable, you should write N/A.\n\nYou should also include a list of references at the " \
+                         "end of the summary.\n\nYou have 15 seconds to complete the task. Don't repeat the same word " \
+                         "too much. Act professional."
+
+        messages = [
+            {"role": "system", "content": system_content},
+        ]
+
+        for idx, text_input in enumerate(text_inputs):
+            message_type = types[idx]
+            messages.append({"role": "user", "content": f"{message_type}: {text_input}"})
 
         completion = openai.ChatCompletion.create(
             model="gpt-3.5-turbo",
-            messages=[
-                {"role": "system",
-                 "content": "You are an assistant with one job: summarize the following conversation and highlight "
-                            "the most important points under bullet points, and going back to the line after each "
-                            "bullet point, as if you were using the input to build a project proposal contract. You "
-                            "will get both the transcription of audio files and a text input. If information is "
-                            "repeated in both the audio files and the text input, you should only include it once in "
-                            "the summary.\n\nYour response should be organized as follows:\n1. Project "
-                            "description\n2. Goal\n3. Objectives \n\n 4. Methodology \n\n 5. Scope \n\n 6. "
-                            "Deliverables \n\n 7. Timeline \n\n 8. Budget \n\n 9. Risks \n\n 10. Conclusion. \n\n If "
-                            "a section is not applicable, you should write N/A.\n\nYou should also include a list of "
-                            "references at the end of the summary.\n\nYou have 15 seconds to complete the task. Don't "
-                            "repeat the same word too much. Act professional."},
-
-                {"role": "user", "content": text_input}
-            ]
+            messages=messages
         )
 
         if completion.choices and completion.choices[0].message:
@@ -65,7 +78,18 @@ class AudioUploadView(View):
     def transcribe_audio_with_api(self, audio_file):
         openai.api_key = API_KEY
 
-        response = openai.Audio.translate("whisper-1", audio_file)
+        def convert_to_wav(input_file, output_file):
+            audio = AudioSegment.from_file(input_file)
+            audio.export(output_file, format='wav')
+            return output_file
+
+        output_file = 'static/audio/' + str(random.randint(1, 1000000)) + '.wav'
+        audio_wav = convert_to_wav(audio_file, output_file)
+
+        with open(audio_wav, 'rb') as file:
+            response = openai.Audio.translate("whisper-1", file)
+
+        os.remove(audio_wav)
 
         if response:
             transcription = response.get('text')
