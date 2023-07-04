@@ -13,7 +13,7 @@ load_dotenv(dotenv_path)
 API_KEY = os.getenv("API_KEY")  # Access the API key from environment variable
 
 
-class AudioUploadView(View):
+class SummaryGPT(View):
     def get(self, request):
         return render(request, 'upload.html')
 

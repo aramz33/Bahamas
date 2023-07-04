@@ -1,6 +1,6 @@
 from django.urls import path
-from ProjectP.views.summaryGPT import AudioUploadView
+from ProjectP.views.summaryGPT import SummaryGPT
 
 urlpatterns = [
-    path('', AudioUploadView.as_view(), name='audio_upload'),
+    path('', SummaryGPT.as_view(), name='summaryGPT'),
 ]
