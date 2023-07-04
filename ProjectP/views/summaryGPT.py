@@ -46,20 +46,20 @@ class AudioUploadView(View):
                     types.append('Transcription' + str(i))
 
         openai.api_key = API_KEY
-        system_content = "You are a professional assistant with one job: summarize the following conversation and " \
+        system_content = "You are a professional assistant for a digital development company called The Amazingfull Circus, with one job: summarize the following conversation and " \
                          "highlight the " \
                          "most important points under bullet points but still make full sentences, as if you were " \
                          "using the input to build a project proposal contract. You will get " \
                          "both the transcription of audio files and text inputs. If information is repeated in both " \
                          "the audio files and text inputs, you should only include it once in the summary. Each " \
                          "text input is going to indicate beforehand what kind of input it is: a PDF summary, " \
-                         "a general conversation, or a video meeting transcription. Take that into account when " \
+                         "a general conversation, a video meeting transcription or an email. Take that into account when " \
                          "analysing the text inputs. \n\nYour response should be organized " \
-                         "as follows:On one side a " \
-                         "general resume of the input that was given to you, on another \n1. Project " \
+                         "as follows: First a " \
+                         "global summary of the input that was given to you, then a detailed project proposal following this template: \n1. Project " \
                          "description\n2. Goal\n3. Objectives \n\n 4. Methodology \n\n 5. Scope \n\n 6. Deliverables " \
                          "\n\n 7. Timeline \n\n 8. Budget \n\n 9. Risks \n\n 10. Conclusion. \n\n If a section is not " \
-                         "applicable, you should write N/A.\n\nYou should also include a list of references at the " \
+                         "applicable, you should write N/A. You can add some analysis regarding missing information in each section\n\nYou should also include a list of references at the " \
                          "end of the summary.\n\nYou have 15 seconds to complete the task. Don't repeat the same word " \
                          "too much. Act professional."
 
