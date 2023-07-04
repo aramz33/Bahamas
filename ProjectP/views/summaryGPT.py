@@ -5,8 +5,12 @@ from django.shortcuts import render
 from django.views import View
 from pydub import AudioSegment
 import os
+from dotenv import load_dotenv
 
-API_KEY = "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"
+dotenv_path = 'config.env'
+load_dotenv(dotenv_path)
+
+API_KEY = os.getenv("API_KEY")  # Access the API key from environment variable
 
 
 class AudioUploadView(View):
@@ -44,13 +48,15 @@ class AudioUploadView(View):
         openai.api_key = API_KEY
         system_content = "You are a professional assistant with one job: summarize the following conversation and " \
                          "highlight the " \
-                         "most important points under bullet points, and going back to the line after each bullet " \
-                         "point, as if you were using the input to build a project proposal contract. You will get " \
+                         "most important points under bullet points but still make full sentences, as if you were " \
+                         "using the input to build a project proposal contract. You will get " \
                          "both the transcription of audio files and text inputs. If information is repeated in both " \
                          "the audio files and text inputs, you should only include it once in the summary. Each " \
-                         "text_input is going to indicate beforehand what kind of input it is: a PDF summary, " \
+                         "text input is going to indicate beforehand what kind of input it is: a PDF summary, " \
                          "a general conversation, or a video meeting transcription. Take that into account when " \
-                         "analysing the text inputs.\n\nYour response should be organized as follows:\n1. Project " \
+                         "analysing the text inputs. \n\nYour response should be organized " \
+                         "as follows:On one side a " \
+                         "general resume of the input that was given to you, on another \n1. Project " \
                          "description\n2. Goal\n3. Objectives \n\n 4. Methodology \n\n 5. Scope \n\n 6. Deliverables " \
                          "\n\n 7. Timeline \n\n 8. Budget \n\n 9. Risks \n\n 10. Conclusion. \n\n If a section is not " \
                          "applicable, you should write N/A.\n\nYou should also include a list of references at the " \
@@ -89,7 +95,7 @@ class AudioUploadView(View):
         with open(audio_wav, 'rb') as file:
             response = openai.Audio.translate("whisper-1", file)
 
-        os.remove(audio_wav)
+        os.remove(output_file)
 
         if response:
             transcription = response.get('text')
