@@ -1,5 +1,4 @@
 import random
-
 import openai
 from django.shortcuts import render
 from django.views import View
@@ -105,7 +104,7 @@ class SummaryGPT(View):
         output_file = 'static/audio/' + str(random.randint(1, 1000000)) + '.wav'
         audio_wav = convert_to_wav(audio_file, output_file)
 
-        segment_duration_sec = 60  # Duration of each segment in seconds
+        segment_duration_sec = 120  # Duration of each segment in seconds
 
         # Create a directory to store the segments
         os.makedirs('segments', exist_ok=True)
