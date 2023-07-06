@@ -5,11 +5,12 @@ from django.views import View
 from pydub import AudioSegment
 import os
 from dotenv import load_dotenv
+from docx import Document
 
 dotenv_path = 'config.env'
 load_dotenv(dotenv_path)
 
-API_KEY = os.getenv("API_KEY")  # Access the API key from environment variable
+API_KEY = os.getenv("API_KEY")  # Access the API key from environment variable in config.env
 
 
 class SummaryGPT(View):
@@ -20,9 +21,10 @@ class SummaryGPT(View):
         uploaded_files = request.FILES.getlist('files')
         text_inputs = request.POST.getlist('text')
         types = request.POST.getlist('type')
+        doc_files = request.FILES.getlist('video')
 
-        if uploaded_files or text_inputs:
-            summary = self.generate_summary(text_inputs, types, uploaded_files)
+        if uploaded_files or text_inputs or doc_files:
+            summary = self.generate_summary(text_inputs, types, uploaded_files, doc_files)
             if summary:
                 return render(request, 'upload.html', {'success': 'Summary: ' + summary})
             else:
@@ -30,7 +32,7 @@ class SummaryGPT(View):
 
         return render(request, 'upload.html', {'error': 'No file or text input provided.'})
 
-    def generate_summary(self, text_inputs, types, audio_files):
+    def generate_summary(self, text_inputs, types, audio_files, doc_files):
 
         if audio_files:
             openai.api_key = API_KEY
@@ -73,6 +75,14 @@ class SummaryGPT(View):
         for idx, text_input in enumerate(text_inputs):
             message_type = types[idx]
             messages.append({"role": "user", "content": f"{message_type}: {text_input}"})
+
+        for idx, doc_file in enumerate(doc_files):
+            doc = Document(doc_file)
+            text_content = ""
+            for paragraph in doc.paragraphs:
+                text_content += paragraph.text + " "  # Append each paragraph's text with a space
+            message_type = f"Video Meeting Transcription {idx + 1}"
+            messages.append({"role": "user", "content": f"{message_type}: {text_content}"})
 
         completion = openai.ChatCompletion.create(
             model="gpt-3.5-turbo",

@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
   <title>Project BAHAMAS</title>
   <style>
@@ -65,9 +65,10 @@
           <select name="type">
             <option value="pdf">PDF Summary</option>
             <option value="text">General Text</option>
-            <option value="video">Video Meeting Transcription</option>
               <option value="email">Email</option>
           </select>
+            <label for="video">Upload Video Meeting Transcription (.docx)</label>
+            <input type="file" name="video" multiple>
         </div>
       </div>
 
@@ -121,14 +122,10 @@
       option2.value = 'text';
       option2.textContent = 'General Text';
       select.appendChild(option2);
-      const option3 = document.createElement('option');
-      option3.value = 'video meeting transcription';
-      option3.textContent = 'Video Meeting Transcription';
-      select.appendChild(option3);
-        const option4 = document.createElement('option');
-        option4.value = 'email';
-        option4.textContent = 'Email';
-        select.appendChild(option4);
+        const option3 = document.createElement('option');
+        option3.value = 'email';
+        option3.textContent = 'Email';
+        select.appendChild(option3);
 
 
       textField.appendChild(select);
