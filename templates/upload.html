@@ -56,6 +56,9 @@
 
       <label for="file">Upload an audio file (Max size: 25MB)</label>
       <input type="file" name="files" accept="audio/*" multiple onchange="checkFileSize(this)">
+        <br>
+        <label for="video">Upload Video Meeting Transcription (.docx)</label>
+        <input type="file" name="video" accept="docx/*" multiple>
 
       <div id="text-fields-container">
         <div class="text-field">
@@ -67,8 +70,6 @@
             <option value="text">General Text</option>
               <option value="email">Email</option>
           </select>
-            <label for="video">Upload Video Meeting Transcription (.docx)</label>
-            <input type="file" name="video" multiple>
         </div>
       </div>
 
@@ -76,13 +77,23 @@
 
       <input type="submit" value="Generate summary">
     </form>
+  <div id="assistant-questions"></div>
 
     {% if success %}
       <p>{{ success }}</p>
+        <div class="comment-container">
+        <form method="post" enctype="multipart/form-data">
+          {% csrf_token %}
+          <input type="hidden" name="comment" value="{{ comment }}">
+          <input type="text" name="new_comment" placeholder="Enter your comment">
+          <input type="submit" value="Generate new summary">
+        </form>
+      </div>
     {% endif %}
     {% if error %}
       <p>{{ error }}</p>
     {% endif %}
+
   </div>
 
   <script>
@@ -115,23 +126,23 @@
       const select = document.createElement('select');
       select.name = 'type';
       const option1 = document.createElement('option');
-      option1.value = 'pdf summary';
-      option1.textContent = 'PDF Summary';
+      option1.value = 'text';
+      option1.textContent = 'General Text';
       select.appendChild(option1);
       const option2 = document.createElement('option');
-      option2.value = 'text';
-      option2.textContent = 'General Text';
+      option2.value = 'pdf summary';
+      option2.textContent = 'PDF Summary';
       select.appendChild(option2);
-        const option3 = document.createElement('option');
-        option3.value = 'email';
-        option3.textContent = 'Email';
-        select.appendChild(option3);
+      const option3 = document.createElement('option');
+      option3.value = 'email';
+      option3.textContent = 'Email';
+      select.appendChild(option3);
 
 
       textField.appendChild(select);
 
       container.appendChild(textField);
     }
-  </script>
+</script>
 </body>
 </html>

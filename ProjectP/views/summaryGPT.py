@@ -84,13 +84,13 @@ class SummaryGPT(View):
             message_type = f"Video Meeting Transcription {idx + 1}"
             messages.append({"role": "user", "content": f"{message_type}: {text_content}"})
 
+
         completion = openai.ChatCompletion.create(
             model="gpt-3.5-turbo",
-            messages=messages
+            messages=messages,
         )
 
         if completion.choices and completion.choices[0].message:
-            messages.append({"role": "assistant", "content": completion.choices[0].message.content})
             return completion.choices[0].message.content
 
         return None
