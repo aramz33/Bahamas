@@ -42,7 +42,7 @@
     background: #0a081e !important;
     border-radius: 10px;
     color: #fff;
-    white-space: pre-line;
+    white-space: pre-wrap;
 
     }
   </style>
@@ -114,7 +114,7 @@
       const select = document.createElement('select');
       select.name = 'type';
       const option1 = document.createElement('option');
-      option1.value = 'pdf';
+      option1.value = 'pdf summary';
       option1.textContent = 'PDF Summary';
       select.appendChild(option1);
       const option2 = document.createElement('option');
@@ -122,9 +122,14 @@
       option2.textContent = 'General Text';
       select.appendChild(option2);
       const option3 = document.createElement('option');
-      option3.value = 'video';
+      option3.value = 'video meeting transcription';
       option3.textContent = 'Video Meeting Transcription';
       select.appendChild(option3);
+        const option4 = document.createElement('option');
+        option4.value = 'email';
+        option4.textContent = 'Email';
+        select.appendChild(option4);
+
 
       textField.appendChild(select);
 
