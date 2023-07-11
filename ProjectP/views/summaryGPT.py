@@ -6,6 +6,8 @@ from pydub import AudioSegment
 import os
 from dotenv import load_dotenv
 from docx import Document
+from django.shortcuts import redirect
+
 
 dotenv_path = 'config.env'
 load_dotenv(dotenv_path)
@@ -14,19 +16,23 @@ API_KEY = os.getenv("API_KEY")  # Access the API key from environment variable i
 
 
 class SummaryGPT(View):
-    def get(self, request):
+    @staticmethod
+    def get(request):
         return render(request, 'upload.html')
 
     def post(self, request):
-        uploaded_files = request.FILES.getlist('files')
+        audio_files = request.FILES.getlist('audio_files')
         text_inputs = request.POST.getlist('text')
         types = request.POST.getlist('type')
         doc_files = request.FILES.getlist('video')
 
-        if uploaded_files or text_inputs or doc_files:
-            summary = self.generate_summary(text_inputs, types, uploaded_files, doc_files)
+        if types == ["None"]:
+            types = []
+
+        if audio_files or text_inputs or doc_files:
+            summary = self.generate_summary(text_inputs, types, audio_files, doc_files)
             if summary:
-                return render(request, 'upload.html', {'success': 'Summary: ' + summary})
+                return redirect('summary_result')
             else:
                 return render(request, 'upload.html', {'error': 'Failed to generate summary.'})
 
@@ -59,43 +65,56 @@ class SummaryGPT(View):
                          "when " \
                          "analysing the text inputs. If you get different spellings, always choose the spelling that " \
                          "is provided in an email, a pdf summary or a general text before the ones coming from an " \
-                         "audio transcription or a video meeting transcription. \n\nYour response should be organized "\
+                         "audio transcription or a video meeting transcription. \n\nYour response should be organized " \
                          "" \
-                         "as follows: \n1. Project " \
-                         "description\n2. Goal\n3. Objectives \n\n 4. Methodology \n\n 5. Scope \n\n 6. Deliverables " \
-                         "\n\n 7. Timeline \n\n 8. Budget \n\n 9. Risks \n\n 10. Conclusion. \n\n If a section is not " \
-                         "applicable, you should write N/A. You can add some analysis regarding missing information " \
+                         "as follows: \n\n\1. Project " \
+                         "description\n\n 2. Goal\n\n3. Objectives \n\n 4. Methodology \n\n 5. Scope \n\n 6. " \
+                         "Deliverables " \
+                         "\n\n 7. Timeline \n\n 8. Budget \n\n 9. Risks \n\n 10. Conclusion. \n\n You can add some " \
+                         "analysis regarding missing information " \
                          "in each section\n\nYou should also include a list of references at the " \
-                         "end of the summary.\n\n"
+                         "end of the summary.\n\n. Watch out for proper nouns and acronyms. Document names should be " \
+                         "a good source for company names. Don't trust video meeting transcriptions for proper nouns " \
+                         "orthography \n\n"
 
         messages = [
             {"role": "system", "content": system_content},
         ]
-
-        for idx, text_input in enumerate(text_inputs):
-            message_type = types[idx]
-            messages.append({"role": "user", "content": f"{message_type}: {text_input}"})
 
         for idx, doc_file in enumerate(doc_files):
             doc = Document(doc_file)
             text_content = ""
             for paragraph in doc.paragraphs:
                 text_content += paragraph.text + " "  # Append each paragraph's text with a space
-            message_type = f"Video Meeting Transcription {idx + 1}"
+            document_name = doc_file.name
+            message_type = f"Video Meeting Transcription {idx + 1} - Document name: {document_name}"
             messages.append({"role": "user", "content": f"{message_type}: {text_content}"})
 
+        if text_inputs != [''] and types != []:
+            for idx, text_input in enumerate(text_inputs):
+                message_type = types[idx]
+                messages.append({"role": "user", "content": f"{message_type}: {text_input}"})
+        else:
+            return None
 
         completion = openai.ChatCompletion.create(
-            model="gpt-3.5-turbo",
+            model='gpt-3.5-turbo',
             messages=messages,
+            temperature=0,
         )
 
+        from ProjectP.models import Summary
+
         if completion.choices and completion.choices[0].message:
-            return completion.choices[0].message.content
+            system_content = completion.choices[0].message.content
+            summary = Summary(content=system_content)
+            summary.save()
+            return system_content
 
         return None
 
-    def transcribe_audio_with_api(self, audio_file):
+    @staticmethod
+    def transcribe_audio_with_api(audio_file):
         def convert_to_wav(input_file, output_file):
             audio = AudioSegment.from_file(input_file)
             audio.export(output_file, format='wav')
@@ -142,4 +161,3 @@ class SummaryGPT(View):
         os.rmdir('segments')
 
         return full_transcription
-

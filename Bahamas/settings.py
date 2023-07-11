@@ -19,13 +19,24 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/4.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-=2c9)u3zq)mrn$^(5a9u)@k80iu%3ytj^909f@1lvw*6ex+ip8'
+from dotenv import load_dotenv
+dotenv_path = 'config.env'
+load_dotenv(dotenv_path)
+
+SECRET_KEY = os.getenv("SECRET_KEY")
+SECURE_HSTS_SECONDS = 60
+SECURE_SSL_REDIRECT = True
+SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+SESSION_COOKIE_SECURE = True
+CSRF_COOKIE_SECURE = True
+SECURE_HSTS_PRELOAD = True
+
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
 
-ALLOWED_HOSTS = ['ai.theamazingfull.com']
-
+ALLOWED_HOSTS = ['ai.theamazingfull.com',
+                 '127.0.0.1']
 # Application definition
 
 INSTALLED_APPS = [
@@ -114,9 +125,6 @@ STATIC_URL = '/static/'
 
 STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 
-STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, 'Bahamas/static')
-]
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.1/ref/settings/#default-auto-field

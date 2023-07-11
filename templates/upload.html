@@ -46,6 +46,7 @@
 
     }
   </style>
+
 </head>
 <body>
   <div class="form-container">
@@ -55,7 +56,7 @@
       {% csrf_token %}
 
       <label for="file">Upload an audio file (Max size: 25MB)</label>
-      <input type="file" name="files" accept="audio/*" multiple onchange="checkFileSize(this)">
+      <input type="file" name="audio_files" accept="audio/*" multiple onchange="checkFileSize(this)">
         <br>
         <label for="video">Upload Video Meeting Transcription (.docx)</label>
         <input type="file" name="video" accept="docx/*" multiple>
@@ -63,13 +64,18 @@
       <div id="text-fields-container">
         <div class="text-field">
           <label for="text">Enter your text:</label>
-          <textarea name="text" rows="4" cols="50"></textarea>
+            <label>
+                <textarea name="text" rows="4" cols="50"></textarea>
+            </label>
 
-          <select name="type">
-            <option value="pdf">PDF Summary</option>
-            <option value="text">General Text</option>
-              <option value="email">Email</option>
-          </select>
+            <label>
+                <select name="type">
+                    <option value="None">---</option>
+                <option value="pdf summary">PDF Summary</option>
+                <option value="additional information">Add specifications</option>
+                  <option value="email">Email</option>
+              </select>
+            </label>
         </div>
       </div>
 
@@ -81,14 +87,6 @@
 
     {% if success %}
       <p>{{ success }}</p>
-        <div class="comment-container">
-        <form method="post" enctype="multipart/form-data">
-          {% csrf_token %}
-          <input type="hidden" name="comment" value="{{ comment }}">
-          <input type="text" name="new_comment" placeholder="Enter your comment">
-          <input type="submit" value="Generate new summary">
-        </form>
-      </div>
     {% endif %}
     {% if error %}
       <p>{{ error }}</p>
