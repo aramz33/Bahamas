@@ -160,6 +160,6 @@ class SummaryGPT(View):
         full_transcription = ' '.join(transcriptions)
 
         os.remove(audio_wav)
-        os.rmdir('segments')
+        os.rmdir('segments') if os.path.exists('segments') else None
 
         return full_transcription
