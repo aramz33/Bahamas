@@ -2,3 +2,6 @@ Django==4.2.3
 openai==0.27.8
 pydub==0.25.1
 python-dotenv==1.0.0
+python-docx==0.8.11
+django-on-heroku==1.1.2
+
