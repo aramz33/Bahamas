@@ -1,5 +1,4 @@
 from django.shortcuts import render
-from ProjectP.models import Summary
 from django.views import View
 import openai
 import os
@@ -9,10 +8,10 @@ from dotenv import load_dotenv
 dotenv_path = 'config.env'
 load_dotenv(dotenv_path)
 API_KEY = os.getenv("API_KEY")  # Access the API key from environment variable in config.env
-
 class SummaryResultView(View):
     @staticmethod
     def get(request):
+        from ProjectP.models import Summary
         summary = Summary.objects.last()  # Assuming the latest summary is the one generated
         if summary:
             return render(request, 'summary_result.html', {'summary': summary.content})
@@ -20,6 +19,7 @@ class SummaryResultView(View):
             return render(request, 'summary_result.html', {'error': 'Summary not found.'})
 
     def post(self, request):
+        from ProjectP.models import Summary
         user_input = request.POST.get('user_input')
         summary = Summary.objects.last()  # Assuming the latest summary is the one generated
         openai.api_key = API_KEY
