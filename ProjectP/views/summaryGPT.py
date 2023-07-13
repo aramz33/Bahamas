@@ -1,15 +1,13 @@
-import random
 
-
+import os
 import openai
 from django.shortcuts import render
 from django.views import View
 from pydub import AudioSegment
-import os
 from dotenv import load_dotenv
 from docx import Document
 from django.shortcuts import redirect
-
+import tempfile
 
 dotenv_path = 'config.env'
 load_dotenv(dotenv_path)
@@ -132,7 +130,7 @@ class SummaryGPT(View):
             os.remove(segment_file)
             return None
 
-        output_file = 'Bahamas/media/audio/' + str(random.randint(1, 1000000)) + '.wav'
+        output_file = tempfile.NamedTemporaryFile(suffix='.wav', delete=False).name
         audio_wav = convert_to_wav(audio_file, output_file)
 
         segment_duration_sec = 120  # Duration of each segment in seconds
