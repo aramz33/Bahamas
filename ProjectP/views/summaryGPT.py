@@ -132,7 +132,7 @@ class SummaryGPT(View):
             os.remove(segment_file)
             return None
 
-        output_file = '/media/audio/' + str(random.randint(1, 1000000)) + '.wav'
+        output_file = 'Bahamas/media/audio/' + str(random.randint(1, 1000000)) + '.wav'
         audio_wav = convert_to_wav(audio_file, output_file)
 
         segment_duration_sec = 120  # Duration of each segment in seconds
