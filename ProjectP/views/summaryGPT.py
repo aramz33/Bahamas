@@ -9,8 +9,6 @@ from docx import Document
 from django.shortcuts import redirect
 import tempfile
 
-dotenv_path = 'config.env'
-load_dotenv(dotenv_path)
 
 API_KEY = os.getenv("API_KEY")  # Access the API key from environment variable in config.env
 
