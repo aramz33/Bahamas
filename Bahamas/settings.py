@@ -26,7 +26,9 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 dotenv_path = 'config.env'
 load_dotenv(dotenv_path)
 
-SECRET_KEY = os.getenv("SECRET_KEY")
+from django.core.management.utils import get_random_secret_key
+
+SECRET_KEY=get_random_secret_key()
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.environ.get('DJANGO_DEBUG', '') != 'False'
