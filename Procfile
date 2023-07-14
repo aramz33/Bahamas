@@ -1,3 +1,3 @@
-web: gunicorn Bahamas.wsgi --timeout 120 --workers 2
+web: gunicorn Bahamas.wsgi --timeout 360 --workers 2
 
 
