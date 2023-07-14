@@ -52,6 +52,9 @@ INSTALLED_APPS = [
     'ProjectP.apps.ProjectPConfig',
 ]
 
+ASGI_APPLICATION = 'Bahamas.asgi.application'
+
+
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
     "whitenoise.middleware.WhiteNoiseMiddleware",
@@ -148,7 +151,3 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 MEDIA_URL = '/media/'
 
 django_on_heroku.settings(locals())
-
-
-
-
