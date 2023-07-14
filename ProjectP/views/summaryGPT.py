@@ -25,7 +25,7 @@ class SummaryGPT(View):
         doc_files = request.FILES.getlist('video')
 
         if types == ["None"]:
-            types = []
+            types = ['']
 
         if audio_files or text_inputs or doc_files:
             summary = self.generate_summary(text_inputs, types, audio_files, doc_files)
@@ -88,7 +88,7 @@ class SummaryGPT(View):
             message_type = f"Video Meeting Transcription {idx + 1} - Document name: {document_name}"
             messages.append({"role": "user", "content": f"{message_type}: {text_content}"})
 
-        if text_inputs != [''] and types != []:
+        if text_inputs != [''] and types != ['']:
             for idx, text_input in enumerate(text_inputs):
                 message_type = types[idx]
                 messages.append({"role": "user", "content": f"{message_type}: {text_input}"})
