@@ -6,7 +6,6 @@ from pydub import AudioSegment
 from docx import Document
 from django.shortcuts import redirect
 import tempfile
-from django.http import JsonResponse
 from django.views import View
 
 
@@ -19,7 +18,7 @@ class SummaryGPT(View):
     def get(request):
         return render(request, 'upload.html')
 
-    async def post(self, request):
+    def post(self, request):
         audio_files = request.FILES.getlist('audio_files')
         text_inputs = request.POST.getlist('text')
         types = request.POST.getlist('type')
@@ -29,12 +28,13 @@ class SummaryGPT(View):
             types = ['']
 
         if audio_files or text_inputs or doc_files:
-            summary = await self.generate_summary(text_inputs, types, audio_files, doc_files)
+            summary = self.generate_summary(text_inputs, types, audio_files, doc_files)
             if summary:
-                return JsonResponse({'summary': summary})
+                return redirect('summary_result')
             else:
-                return JsonResponse({'error': 'Failed to generate summary.'})
-        return JsonResponse({'error': 'No file or text input provided.'})
+                return render(request, 'upload.html', {'error': 'Failed to generate summary.'})
+
+        return render(request, 'upload.html', {'error': 'No file or text input provided.'})
 
     async def generate_summary(self, text_inputs, types, audio_files, doc_files):
 
@@ -113,7 +113,7 @@ class SummaryGPT(View):
 
     @staticmethod
     async def transcribe_audio_with_api(audio_file):
-        def convert_to_wav(input_file, output_file):
+        async def convert_to_wav(input_file, output_file):
             audio = AudioSegment.from_file(input_file)
             audio.export(output_file, format='wav')
             return output_file
