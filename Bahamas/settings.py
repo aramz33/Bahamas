@@ -34,6 +34,7 @@ from django.core.management.utils import get_random_secret_key
 
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
+
 SECRET_KEY = get_random_secret_key()
 
 # SECURITY WARNING: don't run with debug turned on in production!
@@ -52,8 +53,6 @@ INSTALLED_APPS = [
     'ProjectP.apps.ProjectPConfig',
 ]
 
-ASGI_APPLICATION = 'Bahamas.asgi.application'
-
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
@@ -70,8 +69,6 @@ STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 SECURE_SSL_REDIRECT = False
 SESSION_COOKIE_SECURE = False
-CSRF_COOKIE_SECURE = False
-
 
 
 ROOT_URLCONF = 'Bahamas.urls'

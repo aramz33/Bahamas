@@ -9,9 +9,7 @@ import tempfile
 from django.views import View
 
 
-
 API_KEY = os.getenv("API_KEY")  # Access the API key from environment variable in config.env
-
 
 class SummaryGPT(View):
     @staticmethod
@@ -36,7 +34,7 @@ class SummaryGPT(View):
 
         return render(request, 'upload.html', {'error': 'No file or text input provided.'})
 
-    async def generate_summary(self, text_inputs, types, audio_files, doc_files):
+    def generate_summary(self, text_inputs, types, audio_files, doc_files):
 
         if audio_files:
             openai.api_key = API_KEY
@@ -44,7 +42,7 @@ class SummaryGPT(View):
             for audio_file in audio_files:
                 # Transcribe each audio file
                 i = 0
-                transcription = await self.transcribe_audio_with_api(audio_file)
+                transcription = self.transcribe_audio_with_api(audio_file)
                 if transcription:
                     i += 1
                     text_inputs.append('\n' + transcription)
@@ -95,7 +93,7 @@ class SummaryGPT(View):
         else:
             return None
 
-        completion = await openai.ChatCompletion.create(
+        completion = openai.ChatCompletion.create(
             model='gpt-3.5-turbo',
             messages=messages,
             temperature=0,
@@ -112,15 +110,15 @@ class SummaryGPT(View):
         return None
 
     @staticmethod
-    async def transcribe_audio_with_api(audio_file):
-        async def convert_to_wav(input_file, output_file):
+    def transcribe_audio_with_api(audio_file):
+        def convert_to_wav(input_file, output_file):
             audio = AudioSegment.from_file(input_file)
             audio.export(output_file, format='wav')
             return output_file
 
-        async def transcribe_segment(segment_file):
+        def transcribe_segment(segment_file):
             with open(segment_file, 'rb') as file:
-                response = await openai.Audio.translate("whisper-1", file)
+                response = openai.Audio.translate("whisper-1", file)
                 if response:
                     transcription = response.get('text')
                     os.remove(segment_file)
@@ -149,9 +147,10 @@ class SummaryGPT(View):
             segment_file = f'segments/segment{i + 1}.wav'
             segment.export(segment_file, format='wav')
 
-            transcription = await transcribe_segment(segment_file)
+            transcription = transcribe_segment(segment_file)
             if transcription:
                 transcriptions.append(transcription)
+                os.remove(segment_file) if os.path.exists(segment_file) else None
 
         full_transcription = ' '.join(transcriptions)
 
