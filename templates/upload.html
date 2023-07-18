@@ -55,8 +55,6 @@
     <form method="post" enctype="multipart/form-data">
       {% csrf_token %}
 
-      <label for="file">Upload an audio file (Max size: 25MB)</label>
-      <input type="file" name="audio_files" accept="audio/*" multiple onchange="checkFileSize(this)">
         <br>
         <label for="video">Upload Video Meeting Transcription (.docx)</label>
         <input type="file" name="video" accept="docx/*" multiple>

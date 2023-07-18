@@ -66,7 +66,7 @@ MIDDLEWARE = [
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 SECURE_SSL_REDIRECT = False
-SESSION_COOKIE_SECURE = False
+SESSION_COOKIE_SECURE = True
 
 
 ROOT_URLCONF = 'Bahamas.urls'
