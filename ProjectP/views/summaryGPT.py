@@ -40,14 +40,14 @@ class SummaryGPT(View):
                          "highlight the " \
                          "most important points under bullet points but still make full sentences, as if you were " \
                          "using the input to build a project proposal contract. You will get " \
-                         "both the transcript of audio files and text inputs. If information is repeated in both " \
-                         "the audio files and text inputs, you should only include it once in the summary. Each " \
+                         "text inputs. If information is repeated in multiple " \
+                         "text inputs, try not repeat it to much, or rephrase it. Each " \
                          "text input is going to indicate beforehand what kind of input it is: a PDF summary, " \
                          "a general conversation, a video meeting transcription or an email. Take that into account " \
                          "when " \
                          "analysing the text inputs. If you get different spellings, always choose the spelling that " \
-                         "is provided in an email, a pdf summary or a general text before the ones coming from an " \
-                         "audio transcription or a video meeting transcription. \n\nYour response should be organized " \
+                         "is provided in an email, a pdf summary or a general text before the ones coming from a " \
+                         "a video meeting transcription. \n\nYour response should be organized " \
                          "" \
                          "as follows: \n\n\1. Project " \
                          "description\n\n 2. Goal\n\n3. Objectives \n\n 4. Methodology \n\n 5. Scope \n\n 6. " \
@@ -76,13 +76,11 @@ class SummaryGPT(View):
             for idx, text_input in enumerate(text_inputs):
                 message_type = types[idx]
                 messages.append({"role": "user", "content": f"{message_type}: {text_input}"})
-        else:
-            return None
 
         completion = openai.ChatCompletion.create(
             model='gpt-3.5-turbo',
             messages=messages,
-            temperature=0,
+            temperature=0.5,
         )
 
         from ProjectP.models import Summary
