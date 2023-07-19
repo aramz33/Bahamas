@@ -9,6 +9,7 @@ from django.views import View
 
 API_KEY = os.getenv("API_KEY")  # Access the API key from environment variable in config.env
 
+
 class SummaryGPT(View):
     @staticmethod
     def get(request):
